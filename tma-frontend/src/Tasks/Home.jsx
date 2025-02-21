@@ -7,6 +7,9 @@ const Home = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Search filter state
+  const [statusFilter, setStatusFilter] = useState("");
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,13 +29,18 @@ const Home = () => {
       });
   }, []);
 
+  // Filter tasks based on status
+  const filteredTasks = tasks.filter(task => 
+    task.status.toLowerCase().includes(statusFilter.toLowerCase())
+  );
+
   // Calculate the tasks to display on the current page
   const indexOfLastTask = currentPage * tasksPerPage;
   const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
+  const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
 
   // Total number of pages
-  const totalPages = Math.ceil(tasks.length / tasksPerPage);
+  const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
 
   // Handle page changes
   const nextPage = () => {
@@ -51,6 +59,17 @@ const Home = () => {
     <>
       {loading && <h1>Loading...</h1>}
       {error && <h1>{error}</h1>}
+
+      {/* Search filter */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by status"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="p-2 border border-gray-300 rounded-lg w-full"
+        />
+      </div>
 
       {/* Task List */}
       <TaskItem tasks={currentTasks} />
